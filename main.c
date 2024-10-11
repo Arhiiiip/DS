@@ -21,6 +21,9 @@ local_id p_id = 0;
 FILE* events_log_file;
 FILE* pipes_log_file;
 
+void task_child(void);
+void task_parent(void);
+
 int send(void* self, local_id dst, const Message* msg) {
     long bytes_written = write(((fd_pair*) self)[dst].fd[1], msg, sizeof(MessageHeader) + msg->s_header.s_payload_len);
     return bytes_written != (sizeof(MessageHeader) + msg->s_header.s_payload_len);
@@ -106,7 +109,7 @@ void init_message_header(Message* msg, MessageType type) {
     msg->s_header.s_type = type;
 }
 
-void task_child() {
+void task_child(void) {
     close_unused_pipes();
     Message* msg = malloc(MAX_MESSAGE_LEN);
 
@@ -133,7 +136,7 @@ void task_child() {
     close_pipes();
 }
 
-void task_parent() {
+void task_parent(void) {
     close_unused_pipes();
     Message* msg = malloc(MAX_MESSAGE_LEN);
 
